@@ -37,10 +37,10 @@ if __name__ == '__main__':
     print(f'{len(accounts)} account{s} created. Generating {transactions} transaction{t}. Please hold...')
 
     with open(save_to, 'w') as csv:
-        moment = _dt.datetime.now()
+        moment = _dt.datetime.now() - _dt.timedelta(days=((transactions//6)+1))
         for i in range(transactions):
             account = random.choice(accounts)
-            moment -= _dt.timedelta(hours=4)
+            moment += _dt.timedelta(hours=4)
             transaction = BankTransaction(account=account, moment=moment.strftime('%Y-%m-%d %H:%M:%S'))
 
             if i == 0: csv.write(f'{transaction.headers()}\n')

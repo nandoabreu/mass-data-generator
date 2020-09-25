@@ -7,9 +7,13 @@ import datetime as _dt
 
 
 class BankAccount:
-    def __init__(self, number=None, owner=None):
-        if not number: number = random.randrange(10001, 99999)
-        if not owner:
+    def __init__(self, number=None, owner=None, generate_owner=False):
+        if not number:
+            number = random.randrange(10001, 99999)
+
+        if not generate_owner:
+            owner = ''
+        elif not owner:
             language = random.choice(('spanish-spain', 'english-united-kingdom', 'portuguese-portugal', 'french-france'))
             res = requests.get(f'https://api.namefake.com/{language}/random/')
             owner = json.loads(res.text)['name']
