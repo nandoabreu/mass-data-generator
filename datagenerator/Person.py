@@ -41,9 +41,9 @@ class Person:
 
         self.full_name = full_name
         self.birth_date = birth_date
-        self.name_origin = '(undefined)'
+        self.name_origin = None
 
-    def create(self, name_origin=None) -> bool:
+    def create(self, name_origin=None):
         '''
         Populate object with random data
 
@@ -59,10 +59,10 @@ class Person:
             if not name_origin:
                 raise RuntimeWarning
             if name_origin not in countries.languages:
-                raise KeyError('I don\'t have {name_origin!r} as an API language. ')
+                raise KeyError(f'I don\'t have {name_origin!r} as an API language. ')
         except Exception as e:
                 name_origin = random.choice(('es_ES', 'en_GB', 'pt_PT', 'fr_FR'))
-                print(f'# INFO: {e}Using language: {name_origin!r}.')
+                print('# INFO: {0}Using language: {1!r}.'.format(str(e).strip('"'), name_origin))
 
         try:
             res = requests.get(f'https://api.namefake.com/{countries.languages[name_origin]}/')
@@ -72,11 +72,8 @@ class Person:
             self.birth_date = data['birth_data']
             self.name_origin = name_origin
 
-            return True
-
         except Exception as e:
             print(f'# ERROR: {e}')
-            return False
 
     @staticmethod
     def create_languages() -> list:
