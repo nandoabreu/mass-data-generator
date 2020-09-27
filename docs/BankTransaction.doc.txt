@@ -1,0 +1,58 @@
+This module provides access to the BankTransaction class
+
+Usage:
+    t1 = BankTransaction()
+    t1.info()
+
+    t2 = BankTransaction(account=BankAccount(number=90101))
+    t2.info()
+
+    account_list = [BankAccount(owner_origin='nn_NO')]
+    t3 = BankTransaction(account=account_list[0])
+    t4 = BankTransaction(account=account_list[0])
+    t3.info()
+    t4.info()
+
+    person_ca = Person()
+    person_ca.create('fr_CA')
+    ba = BankAccount(person=person_ca)
+    transaction = BankTransaction(account=ba)
+    transaction.info()
+
+
+The BankTransaction object can be initialised empty or with arguments
+For each omitted argument, data will be randomly set
+
+Arguments:
+    value (float), optional:
+        float number as in `9999.10` or `-1000`
+        Note: if description is provided, value should be also
+
+    description (str), optional:
+        If not in actions (line 21) and value has `-`, will be a debit
+        If description is in actions, signs in value will be ignored
+        Its recommended to provide a value if description is customised
+
+    moment (str), optional:
+        If provided, recommended `YYYY-mm-dd HH:MM:SS` format
+        If omitted, current date and time will be provided
+
+    account (obj), optional:
+        send a constructed Account object to replace account_number
+        Account has precedence over account_number argument
+
+    account_number (int), optional:
+        recommended to have 4-8 digits
+        or use account argument to use an Account object
+
+Attributes:
+    account_number (int): account number for the transaction
+    account_balance (float): if a BankAccount object is provided
+    description (str),
+    moment (str),
+    value (float)
+
+Methods:
+    info() -> dict:
+        Return a dictionary with Bank Transaction object data
+
