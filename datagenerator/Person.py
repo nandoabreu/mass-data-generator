@@ -1,7 +1,20 @@
 #! /usr/bin/env python3
 '''
-Generate Person object
+This module provides access to the Person class
+
+Usage:
+    p1 = Person(full_name='Lara Gaspar', name_origin='pt_BR')
+    p1.name_origin = 'pt_PT'
+    p1.info()
+
+    p2 = Person('Núria Borges', '1994-04-27')
+    p2.info()
+
+    p3 = Person()
+    p3.create('de_DE') # Auto create a German Person
+    p3.info()
 '''
+from hashlib import md5
 import datetime as _dt
 import random
 import requests
@@ -11,37 +24,28 @@ from . import countries
 
 
 class Person:
-    def __init__(self, full_name=None, birth_date=None):
-        '''
-        Object initialization
+    '''
+    The Person object can be initialised empty or with arguments
+    An ID will be automatically set to the object
 
-        Arguments:
-            full_name (str), optional: if provided, must have at least one name and one family name
-            birth_date (str), optional: if provided, must follow YYYY-MM-DD format
+    Arguments:
+        full_name (str), optional: recommended to have two or more words
+        birth_date (str), optional: recommended to follow YYYY-MM-DD format
+        name_origin (str), optional: follow ISOs 3166 and 639, as in `pt_BR`
 
-        To print object's informations, use Person.info()
-        '''
-        if birth_date:
-            try:
-                birth_obj = _dt.datetime.strptime(f'{birth_date} 00:00:00', '%Y-%m-%d %H:%M:%S')
-                if _dt.datetime.now() < birth_obj:
-                    raise ValueError('Birth date in the future')
-                birth_date = birth_obj.strftime('%Y-%m-%d')
-            except Exception as e:
-                print(f'# WARNING: {e}')
-                birth_date = None
+    Attributes:
+        id (str): unique generated ID
 
-        if full_name:
-            try:
-                if (len(full_name) < 5 or ' ' not in full_name):
-                    raise ValueError('Full name has less than 5 letters or doesn\'t have \'names + family names\'')
-            except Exception as e:
-                full_name = None
-                print(f'# WARNING: {e}')
-
+        full_name (str),
+        birth_date (str),
+        name_origin (str):
+            may be filled manually or via create()
+    '''
+    def __init__(self, full_name=None, birth_date=None, name_origin=None):
+        self.id = f'{md5(str(_dt.datetime.now()).encode("utf-8")).hexdigest()}{id(self)}'
         self.full_name = full_name
         self.birth_date = birth_date
-        self.name_origin = None
+        self.name_origin = name_origin
 
     def create(self, name_origin=None):
         '''
@@ -49,9 +53,8 @@ class Person:
 
         Argument:
             name_origin (str), optional:
-                if provided, must be one of ISO-3166 and ISO-639, as in pt_BR
-                if not provided, one of most common languages will be used
-                to list available codes, use Person.create_languages()
+                if provided, must be one of ISO-3166 and ISO-639, as in `pt_BR`
+                if not provided, one of es_ES, en_GB, pt_PT or fr_FR will be used
         '''
         api = 'https://api.namefake.com/'
 
@@ -68,7 +71,7 @@ class Person:
             res = requests.get(f'https://api.namefake.com/{countries.languages[name_origin]}/')
             data = json.loads(res.text)
 
-            self.full_name = re.sub('(Dra?|Profa?)\.? ', '', data['name'])
+            self.full_name = re.sub('(Dr|Sr|Prof)a?\.? ', '', data['name'])
             self.birth_date = data['birth_data']
             self.name_origin = name_origin
 
@@ -78,13 +81,13 @@ class Person:
     @staticmethod
     def create_languages() -> list:
         '''
-        List available languages when automatically populating Person object
+        List available languages to use as argument in create()
         '''
         return sorted(countries.languages.keys())
 
     def info(self) -> dict:
         '''
-        Return a dictionary with Person information
+        Return a dictionary with Person object data
         '''
-        return { 'full_name': self.full_name, 'birth_date': self.birth_date, 'name_origin': self.name_origin }
+        return { 'id': self.id, 'full_name': self.full_name, 'birth_date': self.birth_date, 'name_origin': self.name_origin }
 
