@@ -51,7 +51,7 @@ class BankAccount:
         owner_name (str),
         number (int)
     '''
-    def __init__(self, number=None, owner_name=None, person=None, owner_origin=False, active=None):
+    def __init__(self, number=None, owner_name=None, person=None, owner_origin=None, active=None):
         owner_id = None
 
         if person or not owner_name:
