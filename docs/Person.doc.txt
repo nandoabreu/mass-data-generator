@@ -1,0 +1,46 @@
+This module provides access to the Person class
+
+Usage:
+    p1 = Person(full_name='Lara Gaspar', name_origin='pt_BR')
+    p1.name_origin = 'pt_PT'
+    p1.info()
+
+    p2 = Person('Núria Borges', '1994-04-27')
+    p2.info()
+
+    p3 = Person()
+    p3.create('de_DE') # Auto create a German Person
+    p3.info()
+
+
+The Person object can be initialised empty or with arguments
+An ID will be automatically set to the object
+
+Arguments:
+    full_name (str), optional: recommended to have two or more words
+    birth_date (str), optional: recommended to follow YYYY-MM-DD format
+    name_origin (str), optional: follow ISOs 3166 and 639, as in `pt_BR`
+
+Attributes:
+    id (str): unique generated ID
+
+    full_name (str),
+    birth_date (str),
+    name_origin (str):
+        may be filled manually or via create()
+
+Methods:
+    create(name_origin):
+        Populate object with random data
+
+        Argument:
+            name_origin (str), optional:
+                if provided, must be one of ISO-3166 and ISO-639, as in `pt_BR`
+                if not provided, one of es_ES, en_GB, pt_PT or fr_FR will be used
+ 
+    create_languages() -> list:
+        List available languages to use as argument in create()
+
+    info() -> dict:
+        Return a dictionary with Person object data
+
