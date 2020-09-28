@@ -22,6 +22,24 @@ import json
 import re
 from . import countries
 
+# Assure logs dir for this module
+import os
+log_dir = 'logs'
+os.makedirs(log_dir, mode=0o777, exist_ok=True)
+
+# Activate logs for this module
+import logging as _log
+log_level = 'INFO'
+log_file = 'Person.log'
+
+# logging hack in case of windows
+_datefmt = '%Y%m%dT%H%M%S' if os.name == 'nt' else '%s'
+
+# Set log level and path in config
+log_file = os.path.join(log_dir, log_file)
+_log.basicConfig(level=log_level, filename=log_file, datefmt=_datefmt,
+                 format='%(asctime)s:%(process)d:%(levelname)s:%(message)s')
+
 
 class Person:
     '''
@@ -47,6 +65,8 @@ class Person:
         self.birth_date = birth_date
         self.name_origin = name_origin
 
+        _log.info(f'Person initiated with ID {self.id}')
+
     def create(self, name_origin=None):
         '''
         Populate object with random data
@@ -56,6 +76,7 @@ class Person:
                 if provided, must be one of ISO-3166 and ISO-639, as in `pt_BR`
                 if not provided, one of es_ES, en_GB, pt_PT or fr_FR will be used
         '''
+        _log.info(f'Person.create() called to populate object')
         api = 'https://api.namefake.com/'
 
         try:
@@ -65,11 +86,17 @@ class Person:
                 raise KeyError(f'I don\'t have {name_origin!r} as an API language. ')
         except Exception as e:
                 name_origin = random.choice(('es_ES', 'en_GB', 'pt_PT', 'fr_FR'))
-                print('# INFO: {0}Using language: {1!r}.'.format(str(e).strip('"'), name_origin))
+                _log.info('{0}Using language: {1!r}.'.format(str(e).strip('"'), name_origin))
 
         try:
-            res = requests.get(f'https://api.namefake.com/{countries.languages[name_origin]}/')
+            url = f'https://api.namefake.com/{countries.languages[name_origin]}/'
+            _log.debug(f'Request from {url}')
+            res = requests.get(url)
+            _log.info(f'API status code: {res.status_code}')
             data = json.loads(res.text)
+            _log.debug(f'namefake.com person\'s name: {data["name"]}')
+            _log.debug(f'namefake.com person\'s uuid: {data["uuid"]}')
+            _log.info(f'namefake.com person\'s URL: {data["url"]}')
 
             self.full_name = re.sub('(Dr|Sr|Prof)a?\.? ', '', data['name'])
             self.birth_date = data['birth_data']
