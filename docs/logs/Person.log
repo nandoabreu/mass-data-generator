@@ -1,0 +1,17 @@
+1601310744:285152:INFO:Person initiated with ID ce1026eed599fc45d2d29bf2667bbaae139951434999984
+1601310744:285152:INFO:Person.create() called to populate object
+1601310744:285152:INFO:Using language: 'pt_PT'.
+1601310744:285152:DEBUG:Request from https://api.namefake.com/portuguese-portugal/
+1601310744:285152:DEBUG:Starting new HTTPS connection (1): api.namefake.com:443
+1601310746:285152:DEBUG:https://api.namefake.com:443 "GET /portuguese-portugal/ HTTP/1.1" 200 653
+1601310746:285152:INFO:API status code: 200
+1601310746:285152:DEBUG:namefake.com person's name: Liliana Rodrigues Amorim
+1601310746:285152:DEBUG:namefake.com person's uuid: 1e30f8f1-61cf-38bd-9809-c6d81342bdb3
+1601310746:285152:INFO:namefake.com person's URL: https://api.namefake.com/portuguese-portugal/female/c137fa4e6716e432503c1731415871f8
+
+1601310771:285160:INFO:Person initiated with ID 0361e3dff3eea71f1a67364631b499f6139807955853616
+1601310771:285160:INFO:Person.create() called to populate object
+1601310771:285160:INFO:Using language: 'pt_PT'.
+1601310775:285160:INFO:API status code: 200
+1601310775:285160:INFO:namefake.com person's URL: https://api.namefake.com/portuguese-portugal/male/a3c9ae7c7bef99d52307a468a1643cd5
+
