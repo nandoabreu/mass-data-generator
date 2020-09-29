@@ -129,5 +129,5 @@ class Person:
         '''
         Return a csv string with Person object data
         '''
-        return f'{self.id},{self.full_name},{self.birth_date},{self.name_origin}'
+        return f'{self.id},"{self.full_name}",{self.birth_date},{self.name_origin}'.replace('None', '').replace('""', '')
 
