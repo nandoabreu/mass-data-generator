@@ -44,3 +44,6 @@ Methods:
     info() -> dict:
         Return a dictionary with Person object data
 
+    csv() -> str:
+        Return a csv string with Person object data
+

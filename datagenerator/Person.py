@@ -91,9 +91,16 @@ class Person:
         try:
             url = f'https://api.namefake.com/{countries.languages[name_origin]}/'
             _log.debug(f'Request from {url}')
+
             res = requests.get(url)
+            status_code = res.status_code
+            if status_code != 200: raise ValueError(f'API status code: {status_code}')
+
             _log.info(f'API status code: {res.status_code}')
             data = json.loads(res.text)
+
+            if len(data["name"]) < 5: raise ValueError(f'API did not return a person name')
+
             _log.debug(f'namefake.com person\'s name: {data["name"]}')
             _log.debug(f'namefake.com person\'s uuid: {data["uuid"]}')
             _log.info(f'namefake.com person\'s URL: {data["url"]}')
@@ -103,7 +110,7 @@ class Person:
             self.name_origin = name_origin
 
         except Exception as e:
-            print(f'# ERROR: {e}')
+            _log.error(e)
 
     @staticmethod
     def create_languages() -> list:
@@ -117,4 +124,10 @@ class Person:
         Return a dictionary with Person object data
         '''
         return { 'id': self.id, 'full_name': self.full_name, 'birth_date': self.birth_date, 'name_origin': self.name_origin }
+
+    def csv(self) -> str:
+        '''
+        Return a csv string with Person object data
+        '''
+        return f'{self.id},{self.full_name},{self.birth_date},{self.name_origin}'
 
