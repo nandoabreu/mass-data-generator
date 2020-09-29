@@ -118,3 +118,9 @@ class CreditCard:
         '''
         return { 'network': self.network, 'issuer': self.issuer, 'number': self.number, 'holder_name': self.holder_name, 'holder_id': self.holder_id, 'expiration': self.expiration }
 
+    def csv(self) -> str:
+        '''
+        Return a csv string with Credit Card object data
+        '''
+        return f'"{self.network}","{self.issuer}",{self.number},"{self.holder_name}",{self.holder_id},{self.expiration}'.replace('None', '').replace('""', '')
+

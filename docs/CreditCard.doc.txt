@@ -48,3 +48,6 @@ Methods:
     info() -> dict:
         Return a dictionary with Credit Card object data
 
+    def csv(self) -> str:
+        Return a csv string with Credit Card object data
+
