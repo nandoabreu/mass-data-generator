@@ -29,7 +29,7 @@ os.makedirs(log_dir, mode=0o777, exist_ok=True)
 
 # Activate logs for this module
 import logging as _log
-log_level = 'INFO'
+log_level = 'DEBUG'
 log_file = 'Person.log'
 
 # logging hack in case of windows
@@ -65,7 +65,8 @@ class Person:
         self.birth_date = birth_date
         self.name_origin = name_origin
 
-        _log.info(f'Person initiated with ID {self.id}')
+        _log.info(f'Person initiated with ID: {self.id}')
+        _log.debug(f'Person initiated with name: {self.full_name}')
 
     def create(self, name_origin=None):
         '''
