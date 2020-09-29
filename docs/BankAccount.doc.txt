@@ -47,4 +47,7 @@ Attributes:
 Methods:
     info() -> dict:
         Return a dictionary with Bank Account object data
-        
+
+    csv() -> str:
+        Return a csv string with Bank Account object data
+

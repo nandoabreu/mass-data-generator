@@ -80,3 +80,9 @@ class BankAccount:
         '''
         return { 'number': self.number, 'balance': self.balance, 'owner_name': self.owner_name, 'owner_id': self.owner_id, 'active': self.active }
 
+    def csv(self) -> str:
+        '''
+        Return a csv string with Bank Account object data
+        '''
+        return f'{self.number},{self.balance},"{self.owner_name}",{self.owner_id},{self.active}'.replace('None', '').replace('""', '')
+
