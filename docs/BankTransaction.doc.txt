@@ -56,3 +56,6 @@ Methods:
     info() -> dict:
         Return a dictionary with Bank Transaction object data
 
+    csv() -> str:
+        Return a csv string with Bank Transaction object data
+
