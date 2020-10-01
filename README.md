@@ -1,11 +1,10 @@
 # mass-data-generator
 
 Mass data generator for dev pruposes. This module generates csv data with as many records as needed, 
-creating people, credit cards, bank accounts and/or bank transactions fake, data to be used in 
+creating people, credit cards, bank accounts and/or bank transactions **fake** data to be used in 
 developing, data science or any purposes.
 
-Created data are invented and random, but some data (credit cards) are generated using real world 
-validation algorithm.
+Created data are invented and random, but some (credit cards) are generated using real validation algorithm.
 
 When generating person data, the [namefake.com](https://namefake.com) API is used. Main module 
 may request a proportional number of names and birthdays and mix queried data in order to 
