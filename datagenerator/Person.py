@@ -95,9 +95,11 @@ class Person:
 
             res = requests.get(url)
             status_code = res.status_code
-            if status_code != 200: raise ValueError(f'API status code: {status_code}')
-
             _log.info(f'API status code: {res.status_code}')
+
+            if status_code != 200:
+                raise ValueError(f'API status code: {status_code}')
+
             data = json.loads(res.text)
 
             if len(data["name"]) < 5: raise ValueError(f'API did not return a person name')
@@ -106,7 +108,7 @@ class Person:
             _log.debug(f'namefake.com person\'s uuid: {data["uuid"]}')
             _log.info(f'namefake.com person\'s URL: {data["url"]}')
 
-            self.full_name = re.sub('(Dr|Dn|Ing|Prof|Sr|Srita)a?\.? ', '', data['name'])
+            self.full_name = re.sub('^(\w+)a?\. ', '', data['name'])
             self.birth_date = data['birth_data']
             self.name_origin = name_origin
 
