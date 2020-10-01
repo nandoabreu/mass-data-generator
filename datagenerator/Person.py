@@ -89,11 +89,12 @@ class Person:
                 name_origin = random.choice(('es_ES', 'en_GB', 'pt_PT', 'fr_FR'))
                 _log.info('{0}Using language: {1!r}.'.format(str(e).strip('"'), name_origin))
 
-        try:
-            url = f'https://api.namefake.com/{countries.languages[name_origin]}/'
-            _log.debug(f'Request from {url}')
+        url = f'https://api.namefake.com/{countries.languages[name_origin]}/'
 
-            res = requests.get(url)
+        try:
+            _log.debug(f'API request to {url}')
+
+            res = requests.get(url, timeout=10)
             status_code = res.status_code
             _log.info(f'API status code: {res.status_code}')
 
@@ -102,7 +103,8 @@ class Person:
 
             data = json.loads(res.text)
 
-            if len(data["name"]) < 5: raise ValueError(f'API did not return a person name')
+            if len(data["name"]) < 5:
+                raise ValueError(f'API did not return a person name')
 
             _log.debug(f'namefake.com person\'s name: {data["name"]}')
             _log.debug(f'namefake.com person\'s uuid: {data["uuid"]}')
