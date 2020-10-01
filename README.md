@@ -39,7 +39,8 @@ _Note: The [config file](config.py) should not be in a public repo, but once the
 -->
 
 ## Run from command line
-From the project's root directory, run the following command and follow instructions:
+From the project's root directory, run the following command and follow instructions to  
+**generate any number of registries and save them to a csv file**:
 
     python -m datagenerator
 
@@ -47,17 +48,19 @@ From the project's root directory, run the following command and follow instruct
 ## Run from python console
 
     from datagenerator.Person import Person
-    p1 = Person()
-    p1.create()
-    p1.info()
-    p1.csv()
+    for i in range(3):
+        p = Person()
+        p.create()
+        if i == 0: print(','.join(p.info().keys()))
+        print(p.csv())
 
     from datagenerator.CreditCard import CreditCard
-    cc = CreditCard(person=p1)
+    cc = CreditCard(person=p)
+    cc.info()
     cc.csv()
 
     from datagenerator.BankAccount import BankAccount
-    acc = BankAccount(person=p1); acc.info()
+    acc = BankAccount(person=p); acc.info()
 
     from datagenerator.BankTransaction import BankTransaction
     t = BankTransaction(account=acc, value=1000.00, description='Opening deposit'); t.info()
@@ -95,6 +98,7 @@ See [docs](docs) for documentation. Or run:
 
 ## To do
 
+* Add automatic tests.
 * Automatic rotation of log files.
 * Log classes other than Person.
 * Document main module.
