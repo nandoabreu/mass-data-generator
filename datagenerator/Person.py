@@ -106,7 +106,7 @@ class Person:
             _log.debug(f'namefake.com person\'s uuid: {data["uuid"]}')
             _log.info(f'namefake.com person\'s URL: {data["url"]}')
 
-            self.full_name = re.sub('(Dr|Sr|Prof)a?\.? ', '', data['name'])
+            self.full_name = re.sub('(Dr|Dn|Sr|Prof|Srit)a?\.? ', '', data['name'])
             self.birth_date = data['birth_data']
             self.name_origin = name_origin
 
