@@ -79,7 +79,7 @@ class BankTransaction:
             if description in actions:
                 operation = actions[description]
             else:
-                operation = '-1' if value < 0 else '+1'
+                operation = -1 if value < 0 else +1
 
         else:
             description = random.choice(list(actions))
