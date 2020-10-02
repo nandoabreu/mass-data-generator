@@ -3,7 +3,7 @@
 This module provides access to the Person class
 
 Usage:
-    p1 = Person(full_name='Lara Gaspar', name_origin='pt_BR')
+    p1 = Person(full_name='Lara Gaspar', subscriber_origin='pt_BR')
     p1.name_origin = 'pt_PT'
     p1.info()
 

@@ -7,7 +7,7 @@ Usage:
     t2 = BankTransaction(account=BankAccount(number=90101))
     t2.info()
 
-    account_list = [BankAccount(owner_origin='nn_NO')]
+    account_list = [BankAccount(subscriber_origin='nn_NO')]
     t3 = BankTransaction(account=account_list[0])
     t4 = BankTransaction(account=account_list[0])
     t3.info()

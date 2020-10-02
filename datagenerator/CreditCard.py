@@ -3,7 +3,7 @@
 This module provides access to the CreditCard class
 
 Usage:
-    c1 = CreditCard(network='Visa', number='4111111111111111')
+    c1 = CreditCard(network='Visa', card_number='4111111111111111')
     c1.info()
 
     p1 = Person()
@@ -36,21 +36,21 @@ class CreditCard:
     Arguments:
         network (str), optional: as in `Visa`, `Mastercard`, `Hipercard`
         issuer (str), optional: as in `Bank of China`, `Lloyds`, `Baroda`
-        number (int), optional: recommended 14 to 16 numbers
+        card_number (int), optional: recommended 14 to 16 numbers
         expiration (str), optional: recommended to follow `MM/YY` format
 
         person (obj), optional:
-            send a constructed Person object to replace holder_name
-            person has precedence over holder_name argument
+            send a constructed Person object to replace subscriber_name
+            person has precedence over subscriber_name argument
 
-        holder_name (str), optional:
+        subscriber_name (str), optional:
             recommended to have two or more names
             or use person argument to use a Person object
 
-        name_origin (str), optional:
+        subscriber_origin (str), optional:
             If sent, must follow ISOs 3166 and 639, as in `pt_BR`
-            If a holder_name is provided, this should qualify holder's origin
-            If neither a holder nor a person is provided, name_origin may help
+            If a subscriber_name is provided, this should qualify subscriber's origin
+            If neither a subscriber nor a person is provided, subscriber_origin may help
             to automatically create a new person with name from this origin
             If network and/or issuer are not provided, this value may help
             choosing not only between global networks or issuers, but also
@@ -59,26 +59,26 @@ class CreditCard:
     Attributes:
         network (str),
         issuer (str),
-        number (int),
-        holder_name (str),
-        holder_id (str),
+        card_number (int),
+        subscriber_name (str),
+        subscriber_id (str),
         expiration (str)
     '''
-    def __init__(self, network=None, issuer=None, number=None, holder_name=None, person=None, name_origin=None, expiration=None):
+    def __init__(self, network=None, issuer=None, card_number=None, subscriber_name=None, person=None, subscriber_origin=None, expiration=None):
         country = None
-        holder_id = None
+        subscriber_id = None
 
-        if person or not holder_name:
+        if person or not subscriber_name:
             if not person or not isinstance(person, Person):
                 person = Person()
-                person.create(name_origin=name_origin)
+                person.create(name_origin=subscriber_origin)
 
-            holder_name = person.full_name
+            subscriber_name = person.full_name
             country = person.name_origin[-2:]
-            holder_id = person.id
+            subscriber_id = person.id
 
-        elif name_origin:
-            country = name_origin[-2:]
+        elif subscriber_origin:
+            country = subscriber_origin[-2:]
 
         if not network:
             network = random.choice([n for n in networks.keys() if networks[n]['country'] in (country, None)])
@@ -86,20 +86,20 @@ class CreditCard:
         if not issuer:
             issuer = random.choice([i for i in issuers.companies.keys() if issuers.companies[i] in (country, None)])
 
-        if not number:
-            number = str(random.choice(networks[network]['prefix']))
+        if not card_number:
+            card_number = str(random.choice(networks[network]['prefix']))
 
             while True:
-                number += str(random.random())[2:3]
-                if len(number) == (networks[network]['digits']-1): break
+                card_number += str(random.random())[2:3]
+                if len(card_number) == (networks[network]['digits']-1): break
 
             s = 0
-            for i, d in enumerate(number[::-1]):
+            for i, d in enumerate(card_number[::-1]):
                 d = int(d)
                 if i % 2 == 0: d *= 2
                 s += sum([int(d) for d in str(d)])
 
-            number = int(number + str(10 - (s % 10)))
+            card_number = int(card_number + str(10 - (s % 10)))
 
         if not expiration:
             expiration = _dt.datetime.now() + _dt.timedelta(days=random.randrange(-6, 48)*30)
@@ -107,20 +107,21 @@ class CreditCard:
 
         self.network = network
         self.issuer = issuer
-        self.number = number
-        self.holder_name = holder_name
-        self.holder_id = holder_id
+        self.card_number = card_number
+        self.subscriber_name = subscriber_name
+        self.subscriber_id = subscriber_id
         self.expiration = expiration
 
     def info(self) -> dict:
         '''
         Return a dictionary with Credit Card object data
         '''
-        return { 'network': self.network, 'issuer': self.issuer, 'number': self.number, 'holder_name': self.holder_name, 'holder_id': self.holder_id, 'expiration': self.expiration }
+        return { 'network': self.network, 'issuer': self.issuer, 'card_number': self.card_number, 
+                 'subscriber_name': self.subscriber_name, 'subscriber_id': self.subscriber_id, 'expiration': self.expiration }
 
     def csv(self) -> str:
         '''
         Return a csv string with Credit Card object data
         '''
-        return f'"{self.network}","{self.issuer}",{self.number},"{self.holder_name}",{self.holder_id},{self.expiration}'.replace('None', '').replace('""', '')
+        return f'"{self.network}","{self.issuer}",{self.card_number},"{self.subscriber_name}",{self.subscriber_id},{self.expiration}'.replace('None', '').replace('""', '')
 

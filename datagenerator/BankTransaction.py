@@ -6,10 +6,10 @@ Usage:
     t1 = BankTransaction()
     t1.info()
 
-    t2 = BankTransaction(account=BankAccount(number=90101))
+    t2 = BankTransaction(account=BankAccount(account_number=90101))
     t2.info()
 
-    account_list = [BankAccount(owner_origin='nn_NO')]
+    account_list = [BankAccount(subscriber_origin='nn_NO')]
     t3 = BankTransaction(account=account_list[0])
     t4 = BankTransaction(account=account_list[0])
     t3.info()
@@ -70,9 +70,9 @@ class BankTransaction:
     def __init__(self, value=None, description=None, moment=None, account=None, account_number=None):
         if account or not account_number:
             if not account or not isinstance(account, BankAccount):
-                account = BankAccount(owner_name='Jane Doe')
+                account = BankAccount(subscriber_name='Jane Doe')
 
-            account_number = account.number
+            account_number = account.account_number
 
         operation = None
         if description:

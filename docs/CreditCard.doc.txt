@@ -20,17 +20,17 @@ Arguments:
     expiration (str), optional: recommended to follow `MM/YY` format
 
     person (obj), optional:
-        send a constructed Person object to replace holder_name
-        person has precedence over holder_name argument
+        send a constructed Person object to replace subscriber_name
+        person has precedence over subscriber_name argument
 
-    holder_name (str), optional:
+    subscriber_name (str), optional:
         recommended to have two or more names
         or use person argument to use a Person object
 
-    name_origin (str), optional:
+    subscriber_origin (str), optional:
         If sent, must follow ISOs 3166 and 639, as in `pt_BR`
-        If a holder_name is provided, this should qualify holder's origin
-        If neither a holder nor a person is provided, name_origin may help
+        If a subscriber_name is provided, this should qualify subscriber's origin
+        If neither a subscriber nor a person is provided, subscriber_origin may help
         to automatically create a new person with name from this origin
         If network and/or issuer are not provided, this value may help
         choosing not only between global networks or issuers, but also
@@ -40,8 +40,8 @@ Attributes:
     network (str),
     issuer (str),
     number (int),
-    holder_name (str),
-    holder_id (str),
+    subscriber_name (str),
+    subscriber_id (str),
     expiration (str)
 
 Methods:
