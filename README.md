@@ -18,7 +18,7 @@ increase performance, reducing requests to the external RESTful service.
 <!--- Start with [Set-up and install](#set-up-and-install).-->
 - To run interactivelly, go to [Run from command line](#run-from-command-line).
 - To run from python shell, skip to [Run from python console](#run-from-python-console).
-<!--- For automatic tests, skip to [Automatic tests](#automatic-tests).-->
+- For automatic tests, skip to [Automatic tests](#automatic-tests).
 - About logs, please move to the corresponding topic, [Logs](#logs).
 - Instructions on advanced/technical documentation, go to [Documentation](#documentation).
 - Or click to skip to the [To do](#to-do) list.
@@ -66,18 +66,10 @@ From the project's root directory, run the following command and follow instruct
     t = BankTransaction(account=acc, value=-100.00, description='Withdrawl'); t.csv()
 
 
-<!--## Automatic tests
-Python tests are available using unittest via Makefile or manually.  
+## Automatic tests
+Python tests are available using unittest:
 
-_Note: to run tests manually, please refer to [Set-up and install](#set-up-and-install) first._  
-_Note: to run tests using Makefile, virtualenv must be already installed._  
-_Note: depending on how the app is started, it may require ` sudo chmod o+w logs/* `._
-
-Python tests are available manually or using Makefile.
-
-- Run ` python3 -m unittest tests/test_* `.
-- Or use make as in ` make test ` to setup, run the tests and clean up.
--->
+    python -m unittest tests/test_*
 
 
 ## Logs
