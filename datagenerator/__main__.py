@@ -7,7 +7,7 @@ import datetime as _dt
 from . import Person, CreditCard, BankAccount, BankTransaction
 
 
-def menu():
+def menu() -> dict:
     options = {
                 'p': { 'title': 'people', 'class': 'Person', 'require': {}, },
                 'c': { 'title': 'credit cards', 'class': 'CreditCard', 'require': { 'Person': 0.5, }, },
@@ -25,6 +25,31 @@ def menu():
         return None
 
     return options[option]
+
+def generate_people(regs_num: int, original_regs: int) -> Person:
+    original_list = []
+    for i in range(regs_num):
+        if len(original_list) < original_regs:
+            obj = Person.Person()
+            obj.create()
+
+            if obj and obj.full_name:
+                original_list.append(obj)
+        else:
+            name = random.choice(original_list).full_name.split(' ')[0]
+            midname = random.choice(original_list).full_name.split(' ')[-1]
+
+            surname_obj = random.choice(original_list)
+            surname = surname_obj.full_name.split(' ')[-1]
+            name_origin = surname_obj.name_origin
+
+            birth_Y = random.choice(original_list).birth_date.split('-')[0]
+            birth_M = random.choice(original_list).birth_date.split('-')[1]
+            birth_D = random.choice(original_list).birth_date.split('-')[2]
+
+            obj = Person.Person(f'{name} {midname} {surname}', f'{birth_Y}-{birth_M}-{birth_D}', name_origin)
+
+        yield obj
 
 
 if __name__ == '__main__':
@@ -53,31 +78,31 @@ if __name__ == '__main__':
         if len(people_csv) < 1: people_csv = tmp
 
         print(f'\n#\tAttention: {original_people} {tit} will be created (slow creation),')
-        print(f'#\tthen the remaining will derive from those {original_people} (fast creation)\n')
+        print(f'#\tother {(people_num-original_people)} (max) will derive from those {original_people} (fast creation)\n')
         #print(f'Up to {people_num} {tit} will be stored in {people_csv}. Please hold...')
 
         with open(people_csv, 'w') as csv:
-            for i in range(people_num):
-                if len(people_list) < original_people:
-                    print(f'Slowly creating [original] person {(i+1)} of {original_people}...', end='\r')
-                    obj = Person.Person()
-                    obj.create()
-                else:
-                    print(f'Rapidly creating [derivated] person {(i+1)} of {people_num}...', end='\r')
-                    name = random.choice(people_list).full_name.split(' ')[0]
-                    midname = random.choice(people_list).full_name.split(' ')[-1]
-                    surname_obj = random.choice(people_list)
-                    surname = surname_obj.full_name.split(' ')[-1]
-                    name_origin = surname_obj.name_origin
-                    birth_Y = random.choice(people_list).birth_date.split('-')[0]
-                    birth_M = random.choice(people_list).birth_date.split('-')[1]
-                    birth_D = random.choice(people_list).birth_date.split('-')[2]
-                    obj = Person.Person(f'{name} {midname} {surname}', f'{birth_Y}-{birth_M}-{birth_D}', name_origin)
+            i = 1
+            empty_obj = 0
+            for obj in generate_people(people_num, original_people):
+                if not (obj and obj.full_name):
+                    empty_obj += 1
+                    if empty_obj > 4:
+                        print(f'{empty_obj} errors on trying to parse person: ABORT')
+                        sys.exit(2)
 
+                    print(f'{empty_obj} errors on parsing person {i}: RETRY', end='\r')
+                    continue
+
+                elif empty_obj > 0:
+                    empty_obj = 0
+
+                print(f'Created person {i} of {people_num}... {" "*30}', end='\r')
                 people_list.append(obj)
 
-                if i == 0: csv.write(','.join(obj.info().keys()) + '\n')
+                if i == 1: csv.write(','.join(obj.info().keys()) + '\n')
                 csv.write(obj.csv() + '\n')
+                i += 1
 
         print(f'{len(people_list)} {tit} created. {" "*40}')
 
@@ -114,6 +139,8 @@ if __name__ == '__main__':
             moment = _dt.datetime.now() - _dt.timedelta(days=((regs//6)+1))
 
         for i in range(regs):
+            pass
+
     '''
             account = random.choice(accounts_list)
             moment += _dt.timedelta(hours=4)
