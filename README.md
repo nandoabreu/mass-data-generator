@@ -10,6 +10,9 @@ When generating person data, the [namefake.com](https://namefake.com) API is use
 may request a proportional number of names and birthdays and mix queried data in order to 
 increase performance, reducing requests to the external RESTful service.
 
+**Note: if you system is configured with ulimits, you may need to generate larger sets 
+in more than one execution; with my cpu limit set to 180, I generate 1M people per time.**
+
 
 &nbsp;  
 &nbsp;  

@@ -22,135 +22,146 @@ def menu() -> dict:
     option = input('Submit your choice: ').lower()
     if option not in options:
         print('Invalid choice.')
-        return None
+        sys.exit(1)
 
     return options[option]
 
-def generate_people(regs_num: int, original_regs: int) -> Person:
-    original_list = []
-    for i in range(regs_num):
-        if len(original_list) < original_regs:
+def generate_people(regs_num: int) -> list:
+    #original_regs = int(regs_num * 0.1)
+    original_regs = min(100, round(regs_num * 0.15))
+
+    print(f'\n#\tAttention: {original_regs:,} people will be created (slow creation),')
+    print(f'#\tand other {(regs_num-original_regs):,} will derive from the those (fast creation).\n')
+
+    original_objs = []
+    response_list = []
+
+    i = 0
+    empty = 0
+    while True:
+        print(f'Creating person {(i+1):,} of {regs_num:,}... {" "*30}', end='\r')
+
+        if len(original_objs) < original_regs:
             obj = Person.Person()
             obj.create()
 
             if obj and obj.full_name:
-                original_list.append(obj)
+                original_objs.append(obj)
+                if empty > 0: empty = 0
+            elif empty > 4:
+                print(f'{empty} errors on trying to parse person: ABORT')
+                return original_objs
+            else:
+                empty +=1
+                print(f'{empty} errors on parsing person {i}: RETRY', end='\r')
+                continue
         else:
-            name = random.choice(original_list).full_name.split(' ')[0]
-            midname = random.choice(original_list).full_name.split(' ')[-1]
+            if not response_list: response_list = original_objs[:]
 
-            surname_obj = random.choice(original_list)
+            name = random.choice(original_objs).full_name.split(' ')[0]
+            midname = random.choice(random.choice(original_objs).full_name.split(' '))
+            surname_obj = random.choice(original_objs)
             surname = surname_obj.full_name.split(' ')[-1]
             name_origin = surname_obj.name_origin
 
-            birth_Y = random.choice(original_list).birth_date.split('-')[0]
-            birth_M = random.choice(original_list).birth_date.split('-')[1]
-            birth_D = random.choice(original_list).birth_date.split('-')[2]
+            birth_Y = random.randint(1940,2000)
+            birth_M = str(random.randint(1,12)).zfill(2)
+            birth_D = str(random.randint(1,28)).zfill(2)
 
-            obj = Person.Person(f'{name} {midname} {surname}', f'{birth_Y}-{birth_M}-{birth_D}', name_origin)
+            obj = Person.Person(full_name=f'{name} {midname} {surname}', birth_date=f'{birth_Y}-{birth_M}-{birth_D}', name_origin=name_origin)
 
-        yield obj
+            response_list.append(obj)
+            if len(response_list) == regs_num:
+                print(f'{len(response_list):,} people created. {" "*40}')
+                print(f'List of objects using {sys.getsizeof(response_list)/(10**6):.1f}MB')
+                return response_list
+
+        i += 1
+
+def generate_accounts(regs_num: int, people_list: list) -> list:
+    response_list = []
+    while len(response_list) < regs_num:
+        print(f'Creating account {len(i)+1} of {regs_num}... {" "*30}', end='\r')
+
+        obj = BankAccount.BankAccount(person=random.choice(people_list))
+        if not obj.number in (o.number for o in response_list):
+            response_list.append(obj)
+
+    print(f'{len(response_list):,} accounts created. {" "*40}')
+    print(f'List of objects using {sys.getsizeof(response_list)/(10**6):.1f} MB')
+    return response_list
 
 
 if __name__ == '__main__':
     pid = os.getpid()
     db = menu()
 
-    if not db: sys.exit(1)
+    main_regs = int(input(f'Generate how many {db["title"]}? '))
+    if main_regs < 1: sys.exit(2)
 
-    regs = int(input(f'Generate how many {db["title"]}? '))
-    if regs < 1: sys.exit(0)
-
-    tit = db['title'].replace(' ', '-')
-    tmp = f'/tmp/csv_with_{regs}_{tit}.{pid}.csv'
-    main_csv = input(f'Save to: (submit path to csv or hit Enter for {tmp}) ')
+    tmp = f'/tmp/{main_regs:,}_{db["title"]}.{pid}.csv'.replace(',', '_').replace(' ', '-')
+    main_csv = input(f'Save to: (submit path to csv or Enter for {tmp}) ')
     if len(main_csv) < 1: main_csv = tmp
 
-    people_csv = None
     people_list = []
     if 'require' in db and 'Person' in db['require']:
-        people_num = round(min(max(1, regs * db['require']['Person']), (regs * db['require']['Person'])))
-        original_people = min(75, round(people_num * 0.15))
-        tit = 'people' if people_num > 1 else 'person'
+        regs = round(min(max(1, main_regs * db['require']['Person']), (main_regs * db['require']['Person'])))
 
-        tmp = f'/tmp/csv_with_{people_num}_{tit}.{pid}.csv'
-        people_csv = input(f'Up to {people_num} {tit} will also be created.\nSave to: (submit path to csv or hit Enter for {tmp}) ')
-        if len(people_csv) < 1: people_csv = tmp
+        tmp = f'/tmp/{regs:,}_people.{pid}.csv'.replace(',', '_').replace(' ', '-')
+        csv = input(f'{regs:,} people will also be created.\nSave to: (submit path to csv or Enter for {tmp}) ')
+        if len(csv) < 1: csv = tmp
 
-        print(f'\n#\tAttention: {original_people} {tit} will be created (slow creation),')
-        print(f'#\tother {(people_num-original_people)} (max) will derive from those {original_people} (fast creation)\n')
-        #print(f'Up to {people_num} {tit} will be stored in {people_csv}. Please hold...')
+        people_list = generate_people(regs)
 
-        with open(people_csv, 'w') as csv:
-            i = 1
-            empty_obj = 0
-            for obj in generate_people(people_num, original_people):
-                if not (obj and obj.full_name):
-                    empty_obj += 1
-                    if empty_obj > 4:
-                        print(f'{empty_obj} errors on trying to parse person: ABORT')
-                        sys.exit(2)
-
-                    print(f'{empty_obj} errors on parsing person {i}: RETRY', end='\r')
-                    continue
-
-                elif empty_obj > 0:
-                    empty_obj = 0
-
-                print(f'Created person {i} of {people_num}... {" "*30}', end='\r')
-                people_list.append(obj)
-
-                if i == 1: csv.write(','.join(obj.info().keys()) + '\n')
-                csv.write(obj.csv() + '\n')
-                i += 1
-
-        print(f'{len(people_list)} {tit} created. {" "*40}')
-
-    accounts_csv = None
-    accounts_list = []
-    if 'require' in db and 'BankAccount' in db['require']:
-        accounts_num = round(min(max(1, regs * db['require']['BankAccount']), (regs * db['require']['BankAccount'])))
-        tit = 'accounts' if accounts_num > 1 else 'account'
-
-        tmp = f'/tmp/csv_with_{accounts_num}_{tit}.{pid}.csv'
-        accounts_csv = input(f'Up to {accounts_num} {tit} will also be created.\nSave to: (submit path to csv or hit Enter for {tmp}) ')
-        if len(accounts_csv) < 1: accounts_csv = tmp
-        #print(f'Up to {accounts_num} {tit} will be stored in {accounts_csv}. Please hold...')
-
-        with open(accounts_csv, 'w') as csv:
-            for i in range(accounts_num):
-                print(f'Creating account {(i+1)} of {accounts_num}...', end='\r')
-
-                obj = BankAccount.BankAccount(person=random.choice(people_list))
-                if obj.number in (o.number for o in accounts_list): continue
-                accounts_list.append(obj)
-
+        with open(csv, 'w') as csv:
+            for i, obj in enumerate(people_list):
                 if i == 0: csv.write(','.join(obj.info().keys()) + '\n')
                 csv.write(obj.csv() + '\n')
 
-        print(f'{len(accounts_list)} {tit} created. {" "*40}')
+    accounts_list = []
+    if 'require' in db and 'BankAccount' in db['require']:
+        regs = round(min(max(1, main_regs * db['require']['BankAccount']), (main_regs * db['require']['BankAccount'])))
 
-    tit = 'registries' if regs > 0 else 'registry'
-    print(f'{regs} {tit} will be stored in {main_csv}. Please hold...')
+        tmp = f'/tmp/{regs:,}_accounts.{pid}.csv'.replace(',', '_').replace(' ', '-')
+        csv = input(f'{regs:,} accounts will also be created.\nSave to: (submit path to csv or Enter for {tmp}) ')
+        if len(csv) < 1: csv = tmp
+
+        accounts_list = generate_accounts(regs, people_list)
+
+        with open(csv, 'w') as csv:
+            for i, obj in enumerate(accounts_list):
+                if i == 0: csv.write(','.join(obj.info().keys()) + '\n')
+                csv.write(obj.csv() + '\n')
+
+    print(f'\n{main_regs:,} {db["title"]} will now be created. Please hold.')
+    import time
 
     with open(main_csv, 'w') as csv:
+        obj_list = []
+
         moment = None
         if db["class"] == 'BankTransaction':
             moment = _dt.datetime.now() - _dt.timedelta(days=((regs//6)+1))
 
-        for i in range(regs):
-            pass
+        if db["class"] == 'Person':
+            obj_list = generate_people(main_regs)
 
-    '''
-            account = random.choice(accounts_list)
-            moment += _dt.timedelta(hours=4)
-            transaction = BankTransaction.BankTransaction(account=account, moment=moment.strftime('%Y-%m-%d %H:%M:%S'))
+        elif db["class"] == 'BankAccount':
+            obj_list = generate_accounts(main_regs, people_list)
 
-            if i == 0: csv.write(f'{transaction.headers()}\n')
-            csv.write(f'{transaction.csv()}\n')
-            print(f'Created {i} of {transactions} transaction{t}.', end='\r')
+        print(f'\n{len(obj_list):,} {db["title"]} will now be stored. Please hold.')
 
-    print(f'{(i+1)} transaction{s} created in {save_to}.')
-    '''
+        for i, obj in enumerate(obj_list):
+            print(f'Storing {(i+1):,} of {len(obj_list):,} {db["title"]}... {" "*30}', end='\r')
 
+            person, account = None, None
+            if people_list: person = random.choice(people_list)
+            if accounts_list: account = random.choice(accounts_list)
+            if moment: moment += _dt.timedelta(hours=4)
+
+            if i == 0: csv.write(','.join(obj.info().keys()) + '\n')
+            csv.write(obj.csv() + '\n')
+
+        print(f'{(i+1):,} {db["title"]} stored. {" "*40}')
     print('Done.')
+

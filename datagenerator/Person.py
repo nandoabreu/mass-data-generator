@@ -20,6 +20,7 @@ import random
 import requests
 import json
 import re
+from requests.exceptions import HTTPError
 from . import countries
 
 # Assure logs dir for this module
@@ -59,11 +60,11 @@ class Person:
         name_origin (str):
             may be filled manually or via create()
     '''
-    def __init__(self, full_name=None, birth_date=None, name_origin=None):
+    def __init__(self, **kwargs):
         self.id = f'{md5(str(_dt.datetime.now()).encode("utf-8")).hexdigest()}{id(self)}'
-        self.full_name = full_name
-        self.birth_date = birth_date
-        self.name_origin = name_origin
+        self.full_name = kwargs.get('full_name') if kwargs.get('full_name') else None
+        self.birth_date = kwargs.get('birth_date') if kwargs.get('birth_date') else None
+        self.name_origin = kwargs.get('name_origin') if kwargs.get('name_origin') else None
 
         _log.info(f'Person initiated with ID: {self.id}')
         _log.debug(f'Person initiated with name: {self.full_name}')
@@ -89,33 +90,41 @@ class Person:
                 name_origin = random.choice(('es_ES', 'en_GB', 'pt_PT', 'fr_FR'))
                 _log.info('{0}Using language: {1!r}.'.format(str(e).strip('"'), name_origin))
 
-        url = f'https://api.namefake.com/{countries.languages[name_origin]}/'
-
+        res = None
         try:
+            url = f'https://api.namefake.com/{countries.languages[name_origin]}/'
             _log.debug(f'API request to {url}')
-
             res = requests.get(url, timeout=10)
-            status_code = res.status_code
-            _log.info(f'API status code: {res.status_code}')
-
-            if status_code != 200:
-                raise ValueError(f'API status code: {status_code}')
-
-            data = json.loads(res.text)
-
-            if len(data["name"]) < 5:
-                raise ValueError(f'API did not return a person name')
-
-            _log.debug(f'namefake.com person\'s name: {data["name"]}')
-            _log.debug(f'namefake.com person\'s uuid: {data["uuid"]}')
-            _log.info(f'namefake.com person\'s URL: {data["url"]}')
-
-            self.full_name = re.sub('^(\w+)a?\. ', '', data['name'])
-            self.birth_date = data['birth_data']
-            self.name_origin = name_origin
 
         except Exception as e:
-            _log.error(e)
+            if 'timeout' in str(e).lower():
+                _log.warning('API request TIMEOUT error.')
+            else:
+                _log.error('API request error:', e)
+
+        if res:
+            try:
+                status_code = res.status_code
+                _log.info(f'API status code: {res.status_code}')
+
+                if status_code != 200:
+                    raise ValueError(f'API status code: {status_code}')
+
+                data = json.loads(res.text)
+
+                if len(data["name"]) < 5:
+                    raise ValueError(f'API did not return a person name')
+
+                _log.debug(f'namefake.com person\'s name: {data["name"]}')
+                _log.debug(f'namefake.com person\'s uuid: {data["uuid"]}')
+                _log.info(f'namefake.com person\'s URL: {data["url"]}')
+
+                self.full_name = re.sub('^(\w+)a?\. ', '', data['name'])
+                self.birth_date = data['birth_data']
+                self.name_origin = name_origin
+
+            except Exception as e:
+                _log.error(e)
 
     @staticmethod
     def create_languages() -> list:
