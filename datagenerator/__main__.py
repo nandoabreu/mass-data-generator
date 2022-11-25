@@ -80,17 +80,31 @@ def generate_people(regs_num: int) -> list:
 
 def generate_accounts(regs_num: int, people_list: list) -> list:
     response_list = []
+    i = 0
     while len(response_list) < regs_num:
-        print(f'Creating account {len(i)+1} of {regs_num}... {" "*30}', end='\r')
+        i += 1
+        print(f'Creating account {i} of {regs_num}... {" "*30}', end='\r')
 
         obj = BankAccount.BankAccount(person=random.choice(people_list))
-        if not obj.number in (o.number for o in response_list):
+        if not obj.account_number in (o.account_number for o in response_list):
             response_list.append(obj)
 
     print(f'{len(response_list):,} accounts created. {" "*40}')
     print(f'List of objects using {sys.getsizeof(response_list)/(10**6):.1f} MB')
     return response_list
 
+def generate_transactions(regs_num: int, accounts_list: list) -> list:
+    response_list = []
+    while len(response_list) < regs_num:
+        print(f'Creating transaction {len(response_list)+1} of {regs_num}... {" "*30}', end='\r')
+
+        obj = BankTransaction.BankTransaction(account=random.choice(accounts_list), value=random.randint(1,1000), description='Transaction description')
+        if not obj.moment in (o.moment for o in response_list):
+            response_list.append(obj)
+
+    print(f'{len(response_list):,} transactions created. {" "*40}')
+    print(f'List of objects using {sys.getsizeof(response_list)/(10**6):.1f} MB')
+    return response_list
 
 if __name__ == '__main__':
     pid = os.getpid()
@@ -134,7 +148,6 @@ if __name__ == '__main__':
                 csv.write(obj.csv() + '\n')
 
     print(f'\n{main_regs:,} {db["title"]} will now be created. Please hold.')
-    import time
 
     with open(main_csv, 'w') as csv:
         obj_list = []
@@ -142,6 +155,8 @@ if __name__ == '__main__':
         moment = None
         if db["class"] == 'BankTransaction':
             moment = _dt.datetime.now() - _dt.timedelta(days=((regs//6)+1))
+            obj_list = generate_transactions(main_regs, accounts_list)
+            
 
         if db["class"] == 'Person':
             obj_list = generate_people(main_regs)
